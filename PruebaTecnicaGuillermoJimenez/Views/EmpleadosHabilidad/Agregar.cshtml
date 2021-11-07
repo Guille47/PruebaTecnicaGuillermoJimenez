@@ -1,0 +1,48 @@
+﻿@model PruebaTecnicaGuillermoJimenez.Models.ViewModels.HabilidadesEmpleadoViewModel
+@{
+    ViewBag.Title = "Agregar";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("Agregar", "EmpleadosHabilidad", FormMethod.Post, new { role = "form", @class = "" }))
+        {
+            @Html.Hidden("IdEmpleado", (string)@ViewBag.IdEmpleado)
+
+            @Html.AntiForgeryToken()
+            @Html.ValidationMessage("error", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(d => d.NombreHabilidad)
+            @Html.TextBoxFor(d => d.NombreHabilidad, new { @class = "form-control basicAutoComplete",  @autocomplete = "off" })
+            @Html.ValidationMessage("NombreHabilidad", new { @class = "text-danger" })
+
+            <br />
+            <div style="text-align:right">
+                <input type="submit" class="btn btn-success btn-block" value="Guardar" />
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            url = "@Url.Content("~/EmpleadosHabilidad/Sugerencia/")"
+            $.get(url, function (data) {
+                if (data) {
+                    var result = [];
+                    for (var i in data)
+                        result.push(data[i].NombreHabilidad);
+                    $(".basicAutoComplete").autocomplete({
+                        source: result
+                    });
+                } else {
+                    alert("Ocurrio un error");
+                }
+            })
+        });
+
+    </script>
+}

@@ -1,0 +1,69 @@
+﻿@model PruebaTecnicaGuillermoJimenez.Models.ViewModels.EmpleadosViewModel
+@{
+    ViewBag.Title = "Agregar";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("Agregar", "Empleados", FormMethod.Post, new { enctype = "multipart/form-data", role = "form", @class = "" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationMessage("error", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(d => d.NombreCompleto)
+            @Html.TextBoxFor(d => d.NombreCompleto, new { @class = "form-control" })
+            @Html.ValidationMessage("NombreCompleto", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(d => d.Cedula)
+            @Html.TextBoxFor(d => d.Cedula, new { @class = "form-control" })
+            @Html.ValidationMessage("Cedula", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(d => d.Correo)
+            @Html.TextBoxFor(d => d.Correo, new { @class = "form-control" })
+            @Html.ValidationMessage("Correo", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(d => d.FechaNacimiento)
+            @Html.TextBoxFor(d => d.FechaNacimiento, new { @class = "form-control datepicker" })
+            @Html.ValidationMessage("FechaNacimiento", new { @class = "text-danger" })
+            <br />
+            <br />
+            @Html.LabelFor(d => d.FechaIngreso)
+            @Html.TextBoxFor(d => d.FechaIngreso, new { @class = "form-control datepicker" })
+            @Html.ValidationMessage("FechaIngreso", new { @class = "text-danger" })
+            <br />
+            <div class="form-group">
+                @Html.LabelFor(d => d.IdJefe)
+                @Html.DropDownListFor(d => d.IdJefe, (List<SelectListItem>)ViewBag.Jefes, "Sin jefe", new { @class = "form-control" })
+                @Html.ValidationMessage("IdJefe", new { @class = "text-danger" })
+            </div>
+            <br />
+            <div class="form-group">
+                @Html.LabelFor(d => d.IdArea)
+                @Html.DropDownListFor(d => d.IdArea, (List<SelectListItem>)ViewBag.Areas, "Selecciona una area", new { @class = "form-control" })
+                @Html.ValidationMessage("IdArea", new { @class = "text-danger" })
+            </div>
+            <br />
+            <div class="form-group">
+                @Html.LabelFor(d => d.FotoFile)
+                @Html.TextBoxFor(d => d.FotoFile, new { @class = "form-control", type = "file", accept = ".png" })
+                @Html.ValidationMessageFor(d => d.FotoFile, "", new { @class = "text-danger" })
+
+            </div>
+            <br />
+            <div style="text-align:right">
+                <input type="submit" class="btn btn-success btn-block" value="Guardar" />
+            </div>
+        }
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(function () {
+        $(".datepicker").datepicker();
+    });
+
+    </script>
+}

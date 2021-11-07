@@ -1,0 +1,95 @@
+﻿@model List<PruebaTecnicaGuillermoJimenez.Models.TableViewModels.EmpleadosTableViewModel>
+@{
+    ViewBag.Title = "Inicio";
+}
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.Message
+    </div>
+}
+
+<h2>Empleados</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        <input type="button" value="Agregar" class="btn btn-primary" onclick="document.location.href='@Url.Content("~/Empleados/Agregar")'" />
+    </div>
+</div>
+<br />
+<select class="form-control" id="Areas" name="Areas" onchange="filterArea(this.value)">
+    <option value="">Selecciona una area</option>
+    @foreach (var item in ViewBag.Areas)
+    {
+        var selected = item.Selected ? "selected='selected'" : "";
+        @:<option value="@item.Value" @selected>@item.Text</option>
+    }
+</select>
+<div class="row">
+    <div class="col-lg-12">
+        <table class="table table-striped table-bordered">
+            <tr>
+                <th>ID de empleado</th>
+                <th>Nombre completo</th>
+                <th>Cedula</th>
+                <th>Correo</th>
+                <th>Fecha de nacimiento</th>
+                <th>Fecha de ingreso</th>
+                <th>Jefe</th>
+                <th>Area</th>
+                <th>Foto</th>
+                <th>Accion</th>
+            </tr>
+            @foreach (var oElement in Model)
+            {
+                <tr>
+                    <td>@oElement.IdEmpleado</td>
+                    <td>@oElement.NombreCompleto</td>
+                    <td>@oElement.Cedula</td>
+                    <td>@oElement.Correo</td>
+                    <td>@oElement.FechaNacimiento</td>
+                    <td>@oElement.FechaIngreso</td>
+                    <td>@oElement.NombreJefe</td>
+                    <td>@oElement.NombreArea</td>
+                    <td>
+                        @{
+                            var imgsrc = "";
+                            if (oElement.Foto != null)
+                            {
+                                var base64 = Convert.ToBase64String(oElement.Foto);
+                                imgsrc = string.Format("data:image/png;base64,{0}", base64);
+                            }
+
+                        }
+                        <img style="max-height:100px;" ; src="@imgsrc" alt="Foto" />
+                    </td>
+                    <td>
+                        <input type="button" value="Editar" class="btn btn-warning" onclick="document.location.href='@Url.Content("~/Empleados/Editar/"+oElement.IdEmpleado)'" />
+                        <input type="button" value="Ver" class="btn btn-primary" onclick="document.location.href='@Url.Content("~/Empleados/Ver/"+oElement.IdEmpleado)'" />
+                        <input type="button" onclick="jsDelete(@oElement.IdEmpleado)" value="Eliminar" class="btn btn-danger" />
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+<script>
+    function jsDelete(id) {
+        url = "@Url.Content("~/Empleados/Eliminar/")" + "/" + id;
+        if (confirm("Deseas eliminar el registro ?")) {
+            $.post(url, function (data) {
+                if (data == "1") {
+                    document.location.href="@Url.Content("~/Empleados/")"
+                } else {
+                    alert("Ocurrio un error");
+                }
+            })
+        }
+    }
+
+    function filterArea(id) {
+        url = "@Url.Content("~/Empleados/Index/")"+ id;
+        document.location.href = url
+    }
+</script>

@@ -1,0 +1,29 @@
+﻿@model PruebaTecnicaGuillermoJimenez.Models.ViewModels.AreasViewModel
+@{
+    ViewBag.Title = "Agregar";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("Agregar", "Areas", FormMethod.Post, new { role = "form", @class = "" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationMessage("error", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(d => d.Nombre)
+            @Html.TextBoxFor(d => d.Nombre, new { @class = "form-control" })
+            @Html.ValidationMessage("Nombre", new { @class = "text-danger" })
+            <br />
+            @Html.LabelFor(d => d.Descripcion)
+            @Html.TextAreaFor(d => d.Descripcion, new { @class = "form-control" })
+            @Html.ValidationMessage("Descripcion", new { @class = "text-danger" })
+            <br />
+            <div style="text-align:right">
+                <input type="submit" class="btn btn-success btn-block" value="Guardar" />
+            </div>
+        }
+    </div>
+</div>
+

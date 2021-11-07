@@ -1,0 +1,122 @@
+﻿@model List<PruebaTecnicaGuillermoJimenez.Models.TableViewModels.EmpleadosTableViewModel>
+@{
+    ViewBag.Title = "Inicio";
+}
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.Message
+    </div>
+}
+
+<h2>Empleados y habilidades</h2>
+
+<br />
+<div class="row">
+    <div class="col-lg-12">
+        <div class="container" id="lista">
+
+        </div>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-lg-12">
+        <div class="container" id="habilidades">
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            url = "@Url.Content("~/EmpleadosHabilidad/EmpleadosJerarquias/")"
+            $.get(url, function (data) {
+                if (data) {
+                    var results = obtenerJerarquias(data, null);
+                    $("#lista").append(printInHtml(results));
+                } else {
+                    alert("Ocurrio un error");
+                }
+            })
+        });
+
+        var obtenerJerarquias = function (empleados, IdJefe) {
+            let node = [];
+            empleados
+                .filter(function (e) { return e.IdJefe === IdJefe })
+                .forEach(function (e) {
+                    var oj = e;
+                    oj.child = obtenerJerarquias(empleados, e.IdEmpleado);
+                    return node.push(oj);
+                })
+            return node;
+        }
+        var printInHtml = function (data) {
+                var ul = $("<ol>");
+            $(data).each(function (i, dir) {
+
+                var li = $(`
+                            <li style='cursor: pointer;'>
+                                <strong>ID</strong> : ${dir.IdEmpleado}
+                                <strong>Nombre Completo </strong> :  ${dir.NombreCompleto}
+                                <input class="btn btn-link" type="button" onclick="agregarHabilidad('${dir.IdEmpleado}')" value="Agregar habilidad">
+                                <input type="button" class="btn btn-link" onclick="verHabilidad('${dir.IdEmpleado}')" value="Ver Habilidades">
+                            </li>
+                        `);
+                    ul.append(li);
+                    if (dir.child != null && dir.child.length > 0) {
+                        li.append(printInHtml(dir.child));
+                    }
+                });
+                return ul;
+        }
+        var verHabilidad = (id) => {
+            var url = '@Url.Content("~/EmpleadosHabilidad/VerHabilidad/")' + id;
+            $.get(url, function (data) {
+                if (data) {
+                    var results = data;
+                    if (results.length > 0) {
+                    var ul = $("<ul>");
+                    results.forEach(data_ => {
+                        var li = $(`
+                                    <li> ${data_.NombreHabilidad}
+                                        <input class="btn btn-link" type="button" onclick="editarHabilidad('${data_.IdHabilidad}')" value="Editar habilidad">
+                                        <input class= "btn btn-link" type = "button" onclick ="eliminarHabilidad('${data_.IdHabilidad}')" value="Eliminar habilidad">
+                                    </li>
+                                `);
+                        ul.append(li);
+                    });
+                        $("#habilidades").html("Habilidades asignadas :" + "<br>");
+                        $("#habilidades").append(ul);
+                    }
+                    else {
+                        $("#habilidades").html("El usuario seleccionado no tiene habilidades asignadas");
+                    }
+                } else {
+                    alert("Ocurrio un error");
+                }
+            })
+        };
+        var agregarHabilidad = (id) => {
+                    document.location.href = '@Url.Content("~/EmpleadosHabilidad/Agregar/")' + id;
+        };
+        var editarHabilidad = (id) => {
+                    document.location.href = '@Url.Content("~/EmpleadosHabilidad/Editar/")' + id;
+        };
+        var eliminarHabilidad = (id) => {
+            url = "@Url.Content("~/EmpleadosHabilidad/Eliminar/")" + id;
+            if (confirm("Deseas eliminar el registro ?")) {
+                $.post(url, function (data) {
+                    if (data == "1") {
+                        document.location.href="@Url.Content("~/EmpleadosHabilidad/")"
+                    } else {
+                        alert("Ocurrio un error");
+                    }
+                })
+            }
+        };
+
+    </script>
+}
