@@ -4,7 +4,7 @@
 }
 @if (ViewBag.Message != null)
 {
-    <div class="alert alert-danger" role="alert">
+    <div class="alert alert-danger" role="alert" id="error">
         @ViewBag.Message
     </div>
 }
@@ -35,7 +35,11 @@
             $.get(url, function (data) {
                 if (data) {
                     var results = obtenerJerarquias(data, null);
-                    $("#lista").append(printInHtml(results));
+                    if (results.length <= 0) {
+                        $("#lista").append("Parece que no hay empleados aun, o que no has establecido a alguien como jefe o que has colocado a un empleado como jefe de un jefe");
+                    } else {
+                        $("#lista").append(printInHtml(results));
+                    }
                 } else {
                     alert("Ocurrio un error");
                 }

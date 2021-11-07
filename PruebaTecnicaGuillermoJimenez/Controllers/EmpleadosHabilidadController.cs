@@ -19,7 +19,8 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
 
             return View();
         }
-        public JsonResult EmpleadosJerarquias() {
+        public JsonResult EmpleadosJerarquias()
+        {
 
             List<JerarquiaEmpleadosTableViewModel> lst = null;
             using (ExamenEntities db = new ExamenEntities())
@@ -76,19 +77,28 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
             {
                 return View(model);
             }
-            using (var db = new ExamenEntities())
+            try
             {
-                Empleado_Habilidad oHabilidadesEmpleados = new Empleado_Habilidad();
-                oHabilidadesEmpleados.IdEmpleado = (int)model.IdEmpleado;
-                oHabilidadesEmpleados.NombreHabilidad = model.NombreHabilidad;
+                using (var db = new ExamenEntities())
+                {
+                    Empleado_Habilidad oHabilidadesEmpleados = new Empleado_Habilidad();
+                    oHabilidadesEmpleados.IdEmpleado = (int)model.IdEmpleado;
+                    oHabilidadesEmpleados.NombreHabilidad = model.NombreHabilidad;
 
-                db.Empleado_Habilidad.Add(oHabilidadesEmpleados);
+                    db.Empleado_Habilidad.Add(oHabilidadesEmpleados);
 
-                db.SaveChanges();
+                    db.SaveChanges();
 
+                }
+
+                return Redirect(Url.Content("~/EmpleadosHabilidad/"));
+            }
+            catch (Exception)
+            {
+                @TempData["Message"] = "No se pudo agregar el registro";
+                return Redirect(Url.Content("~/EmpleadosHabilidad/"));
             }
 
-            return Redirect(Url.Content("~/EmpleadosHabilidad/"));
         }
         public ActionResult Editar(int? id)
         {
@@ -115,20 +125,29 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
             {
                 return View(model);
             }
-            using (var db = new ExamenEntities())
+            try
             {
-                Empleado_Habilidad oHabilidadesEmpleados = db.Empleado_Habilidad.Find(model.IdHabilidad);
+                using (var db = new ExamenEntities())
+                {
+                    Empleado_Habilidad oHabilidadesEmpleados = db.Empleado_Habilidad.Find(model.IdHabilidad);
 
-                oHabilidadesEmpleados.IdEmpleado = model.IdEmpleado;
-                oHabilidadesEmpleados.NombreHabilidad = model.NombreHabilidad;
+                    oHabilidadesEmpleados.IdEmpleado = model.IdEmpleado;
+                    oHabilidadesEmpleados.NombreHabilidad = model.NombreHabilidad;
 
-                db.Entry(oHabilidadesEmpleados).State = System.Data.Entity.EntityState.Modified;
+                    db.Entry(oHabilidadesEmpleados).State = System.Data.Entity.EntityState.Modified;
 
-                db.SaveChanges();
+                    db.SaveChanges();
 
-                return Redirect(Url.Content("~/EmpleadosHabilidad/"));
+                    return Redirect(Url.Content("~/EmpleadosHabilidad/"));
 
+                }
             }
+            catch (Exception)
+            {
+                @TempData["Message"] = "No se pudo editar el registro";
+                return Redirect(Url.Content("~/EmpleadosHabilidad/"));
+            }
+
         }
         public JsonResult Sugerencia()
         {

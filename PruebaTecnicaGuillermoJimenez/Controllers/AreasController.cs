@@ -43,19 +43,25 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
             {
                 return View(model);
             }
-            using (var db = new ExamenEntities())
+
+            try
             {
-                Area oAreas = new Area();
-                oAreas.Nombre = model.Nombre;
-                oAreas.Descripcion = model.Descripcion;
-
-                db.Areas.Add(oAreas);
-
-                db.SaveChanges();
-
+                using (var db = new ExamenEntities())
+                {
+                    Area oAreas = new Area();
+                    oAreas.Nombre = model.Nombre;
+                    oAreas.Descripcion = model.Descripcion;
+                    db.Areas.Add(oAreas);
+                    db.SaveChanges();
+                }
+                return Redirect(Url.Content("~/Areas/"));
             }
-
-            return Redirect(Url.Content("~/Areas/"));
+            catch (Exception ex)
+            {
+                @TempData["Message"] = "No se pudo agregar el registro";
+                return Redirect(Url.Content("~/Areas/"));
+            }
+            
         }
         [HttpGet]
         public ActionResult Editar(int? Id)
@@ -84,30 +90,45 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
             {
                 return View(model);
             }
-            using (var db = new ExamenEntities())
+            try
             {
-                Area oAreas = db.Areas.Find(model.IdArea);
+                using (var db = new ExamenEntities())
+                {
+                    Area oAreas = db.Areas.Find(model.IdArea);
 
-                oAreas.Nombre = model.Nombre;
-                oAreas.Descripcion = model.Descripcion;
+                    oAreas.Nombre = model.Nombre;
+                    oAreas.Descripcion = model.Descripcion;
 
-                db.Entry(oAreas).State = System.Data.Entity.EntityState.Modified;
+                    db.Entry(oAreas).State = System.Data.Entity.EntityState.Modified;
 
-                db.SaveChanges();
+                    db.SaveChanges();
 
+                    return Redirect(Url.Content("~/Areas/"));
+
+                }
+            }
+            catch (Exception ex)
+            {
+                @TempData["Message"] = "No se pudo editar el registro";
                 return Redirect(Url.Content("~/Areas/"));
-
             }
         }
         [HttpPost]
         public ActionResult Eliminar(int Id)
         {
-            using (var db = new ExamenEntities())
+            try
             {
-                Area oAreas = db.Areas.Find(Id);
-                db.Areas.Remove(oAreas);
-                db.SaveChanges();
-                return Content("1");
+                using (var db = new ExamenEntities())
+                {
+                    Area oAreas = db.Areas.Find(Id);
+                    db.Areas.Remove(oAreas);
+                    db.SaveChanges();
+                    return Content("1");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Content("0");
             }
         }
     }

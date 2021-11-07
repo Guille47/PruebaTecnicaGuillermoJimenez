@@ -88,7 +88,7 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
         [HttpGet]
         public ActionResult Agregar()
         {
-            List<SelectListItem> lstJefes = LstJefes();
+            List<SelectListItem> lstJefes = LstJefes(null);
             List<SelectListItem> lstAreas = LstAreas(null);
             ViewBag.Areas = lstAreas;
             ViewBag.Jefes = lstJefes;
@@ -99,29 +99,38 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
         {
             if (!ModelState.IsValid)
             {
-                List<SelectListItem> lstJefes = LstJefes();
+                List<SelectListItem> lstJefes = LstJefes(null);
                 List<SelectListItem> lstAreas = LstAreas(null);
                 ViewBag.Areas = lstAreas;
                 ViewBag.Jefes = lstJefes;
                 return View(model);
             }
-            using (var db = new ExamenEntities())
+            try
             {
-                Empleado oEmpleados = new Empleado();
-                oEmpleados.NombreCompleto = model.NombreCompleto;
-                oEmpleados.Cedula = model.Cedula;
-                oEmpleados.Correo = model.Correo;
-                oEmpleados.FechaNacimiento = model.FechaNacimiento;
-                oEmpleados.FechaIngreso = model.FechaIngreso;
-                oEmpleados.IdJefe = model.IdJefe;
-                oEmpleados.IdArea = model.IdArea;
-                oEmpleados.Foto = new byte[model.FotoFile.ContentLength];
-                model.FotoFile.InputStream.Read(oEmpleados.Foto, 0, model.FotoFile.ContentLength);
+                using (var db = new ExamenEntities())
+                {
+                    Empleado oEmpleados = new Empleado();
+                    oEmpleados.NombreCompleto = model.NombreCompleto;
+                    oEmpleados.Cedula = model.Cedula;
+                    oEmpleados.Correo = model.Correo;
+                    oEmpleados.FechaNacimiento = model.FechaNacimiento;
+                    oEmpleados.FechaIngreso = model.FechaIngreso;
+                    oEmpleados.IdJefe = model.IdJefe;
+                    oEmpleados.IdArea = model.IdArea;
+                    oEmpleados.Foto = new byte[model.FotoFile.ContentLength];
+                    model.FotoFile.InputStream.Read(oEmpleados.Foto, 0, model.FotoFile.ContentLength);
 
-                db.Empleadoes.Add(oEmpleados);
-                db.SaveChanges();
+                    db.Empleadoes.Add(oEmpleados);
+                    db.SaveChanges();
+                }
+                return Redirect(Url.Content("~/Empleados/"));
             }
-            return Redirect(Url.Content("~/Empleados/"));
+            catch (Exception)
+            {
+                @TempData["Message"] = "No se pudo agregar el registro";
+                return Redirect(Url.Content("~/Empleados/"));
+            }
+            
         }
         [HttpGet]
         public ActionResult Editar(int? Id)
@@ -132,7 +141,7 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
                 return Redirect(Url.Content("~/Empleados/"));
             }
 
-            List<SelectListItem> lstJefes = LstJefes();
+            List<SelectListItem> lstJefes = LstJefes(Id);
             List<SelectListItem> lstAreas = LstAreas(null);
 
             EditEmpleadosViewModel empleados = new EditEmpleadosViewModel();
@@ -161,62 +170,92 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
         {
             if (!ModelState.IsValid)
             {
-                List<SelectListItem> lstJefes = LstJefes();
+                List<SelectListItem> lstJefes = LstJefes(model.IdEmpleado);
                 List<SelectListItem> lstAreas = LstAreas(null);
 
                 ViewBag.Areas = lstAreas;
                 ViewBag.Jefes = lstJefes;
                 return View(model);
             }
-            using (var db = new ExamenEntities())
+            try
             {
-                Empleado oEmpleados = db.Empleadoes.Find(model.IdEmpleado);
-
-                oEmpleados.IdEmpleado = model.IdEmpleado;
-                oEmpleados.NombreCompleto = model.NombreCompleto;
-                oEmpleados.Cedula = model.Cedula;
-                oEmpleados.Correo = model.Correo;
-                oEmpleados.FechaNacimiento = model.FechaNacimiento;
-                oEmpleados.FechaIngreso = model.FechaIngreso;
-                oEmpleados.IdJefe = model.IdJefe;
-                oEmpleados.IdArea = model.IdArea;
-                if (model.FotoFile != null)
+                using (var db = new ExamenEntities())
                 {
-                    oEmpleados.Foto = new byte[model.FotoFile.ContentLength];
-                    model.FotoFile.InputStream.Read(oEmpleados.Foto, 0, model.FotoFile.ContentLength);
+                    Empleado oEmpleados = db.Empleadoes.Find(model.IdEmpleado);
+
+                    oEmpleados.IdEmpleado = model.IdEmpleado;
+                    oEmpleados.NombreCompleto = model.NombreCompleto;
+                    oEmpleados.Cedula = model.Cedula;
+                    oEmpleados.Correo = model.Correo;
+                    oEmpleados.FechaNacimiento = model.FechaNacimiento;
+                    oEmpleados.FechaIngreso = model.FechaIngreso;
+                    oEmpleados.IdJefe = model.IdJefe;
+                    oEmpleados.IdArea = model.IdArea;
+                    if (model.FotoFile != null)
+                    {
+                        oEmpleados.Foto = new byte[model.FotoFile.ContentLength];
+                        model.FotoFile.InputStream.Read(oEmpleados.Foto, 0, model.FotoFile.ContentLength);
+                    }
+
+                    db.Entry(oEmpleados).State = System.Data.Entity.EntityState.Modified;
+                    db.SaveChanges();
+
+                    return Redirect(Url.Content("~/Empleados/"));
+
                 }
-
-                db.Entry(oEmpleados).State = System.Data.Entity.EntityState.Modified;
-                db.SaveChanges();
-
-                return Redirect(Url.Content("~/Empleados/"));
-
             }
+            catch (Exception)
+            {
+                @TempData["Message"] = "No se pudo editar el registro";
+                return Redirect(Url.Content("~/Empleados/"));
+            }
+            
         }
         [HttpPost]
         public ActionResult Eliminar(int Id)
         {
-            using (var db = new ExamenEntities())
+            try
             {
-                Empleado oEmpleados = db.Empleadoes.Find(Id);
-                db.Empleadoes.Remove(oEmpleados);
-                db.SaveChanges();
-                return Content("1");
+                using (var db = new ExamenEntities())
+                {
+                    Empleado oEmpleados = db.Empleadoes.Find(Id);
+                    db.Empleadoes.Remove(oEmpleados);
+                    db.SaveChanges();
+                    return Content("1");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Content("0");
             }
         }
 
-        public List<SelectListItem> LstJefes()
+        public List<SelectListItem> LstJefes(int? id)
         {
             List<SelectListItem> lstJefes = null;
             using (ExamenEntities db = new ExamenEntities())
             {
-                lstJefes = (from d in db.Empleadoes
-                            orderby d.IdEmpleado
-                            select new SelectListItem
-                            {
-                                Value = d.IdEmpleado.ToString(),
-                                Text = d.NombreCompleto
-                            }).ToList();
+                if (id == null)
+                {
+                    lstJefes = (from d in db.Empleadoes
+                                orderby d.IdEmpleado
+                                select new SelectListItem
+                                {
+                                    Value = d.IdEmpleado.ToString(),
+                                    Text = d.NombreCompleto
+                                }).ToList();
+                }
+                else
+                {
+                    lstJefes = (from d in db.Empleadoes
+                                orderby d.IdEmpleado
+                                where d.IdEmpleado != id
+                                select new SelectListItem
+                                {
+                                    Value = d.IdEmpleado.ToString(),
+                                    Text = d.NombreCompleto
+                                }).ToList();
+                }
             }
             return lstJefes;
         }
@@ -225,8 +264,9 @@ namespace PruebaTecnicaGuillermoJimenez.Controllers
             List<SelectListItem> lstAreas = null;
             using (ExamenEntities db = new ExamenEntities())
             {
-                
-                if (id == null) {
+
+                if (id == null)
+                {
                     lstAreas = (from d in db.Areas
                                 orderby d.IdArea
                                 select new SelectListItem
